@@ -40,7 +40,7 @@ mcp:
 examples: $(OUTPUTS)
 
 $(EXAMPLES_DIR)/%.png: $(EXAMPLES_DIR)/%.typ lib.typ src/*.typ
-	typst compile $< --root=. --format=png
+	typst compile $< --root=. --format=png --ppi=300
 
 # ──────────────────────────────────────────────
 # Setup
