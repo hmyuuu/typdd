@@ -19,7 +19,7 @@ A three-component toolchain for visualizing Binary Decision Diagrams (BDDs) and 
 |-------|--------|-----------|
 | ≤8 variables | Pure Typst (parse + build + reduce) | Typst/fletcher |
 | 9-20 variables | MCP server (build) → JSON → Typst (render) | Typst/fletcher |
-| >20 variables | MCP server (build + abstract) → JSON → Typst (render) | Typst/fletcher |
+| >20 variables | Rejected (MAX_VARIABLES = 20). Suggest abstraction or decomposition. | — |
 
 ### 1.2 Safety Limits
 
@@ -47,7 +47,7 @@ typdd/
 │   ├── render.typ          # Drawing via fletcher (nodes, edges, labels, styling)
 │   ├── abstract.typ        # Abstraction for large BDDs (collapse subtrees, cut-levels)
 │   ├── styles.typ          # Theme presets + customization API
-│   └── import.typ          # DOT/JSON import for interop with CUDD/BuDDy
+│   └── import.typ          # JSON import for interop with CUDD/BuDDy (DOT parsing handled by MCP)
 ```
 
 ### 2.2 Rendering Foundation
@@ -61,7 +61,7 @@ typdd/
 ### 2.3 Public API
 
 ```typst
-#import "@preview/typdd:0.1.0": bdd, bdd-from-json, bdd-from-dot
+#import "@preview/typdd:0.1.0": bdd, bdd-from-json
 
 // Simple: one-liner from boolean expression
 #bdd("x1 & (x2 | !x3)")
@@ -71,7 +71,7 @@ typdd/
   "x1 & (x2 | !x3)",
   order: ("x3", "x1", "x2"),       // override variable order
   style: "paper",                    // preset theme
-  show-complement: true,             // show complement edges
+  show-complement: true,             // show complement edges (CUDD-style bubble notation)
   reduced: true,                     // apply BDD reduction (default: true)
   width: 60%,                        // diagram width
   labels: (x1: "input_A"),           // rename variable labels
@@ -80,8 +80,8 @@ typdd/
 // From pre-computed structure (MCP output or external tool)
 #bdd-from-json(json("my-bdd.json"))
 
-// From DOT format (CUDD/BuDDy export interop)
-#bdd-from-dot(read("my-bdd.dot"))
+// DOT import: use MCP server's import_dot tool to convert DOT → JSON first,
+// then render via bdd-from-json. DOT parsing is too complex for pure Typst.
 ```
 
 ### 2.4 Expression Syntax
@@ -111,7 +111,7 @@ Following established academic conventions from LaTeX/TikZ BDD drawings:
 | Terminal nodes | Square/rectangle, draw, solid border | shape (square/circle), labels ("0"/"1" or "⊥"/"⊤") |
 | High edge (1) | Solid line, stealth arrow | color, stroke-width, arrow-mark |
 | Low edge (0) | Dashed line, stealth arrow | color, stroke-width, dash-pattern |
-| Complement edge | Dotted + bubble notation | color, bubble-style |
+| Complement edge | Bubble marker (○) on the edge (CUDD convention). Solid/dashed distinction preserved — bubble is additive. | color, bubble-size, bubble-position |
 | Layout | Top-to-bottom, one variable per level | direction (TB/BT/LR/RL), level-sep, node-sep |
 | Edge labels | Optional "0"/"1" labels | position, font-size |
 
@@ -174,6 +174,7 @@ All tools that operate on a BDD take an explicit `bdd_id` parameter. No "current
 | `restrict_bdd` | Cofactor (restrict variable) | `{ bdd_id: string, var: string, value: 0\|1 }` | `{ bdd_id, structure, stats }` |
 | `is_equivalent` | Check if two BDDs are equivalent | `{ bdd1_id: string, bdd2_id: string }` | `{ equivalent: boolean, distinguishing_input?: object }` |
 | `satisfying_count` | Count satisfying assignments | `{ bdd_id: string }` | `{ count: number, total: number, ratio: number }` |
+| `import_dot` | Parse DOT format into BDD | `{ dot: string, id?: string }` | `{ bdd_id, structure, stats }` |
 
 ### 3.3 Resources
 
@@ -365,9 +366,11 @@ BDD structure exchanged between Typst lib and MCP:
 
 ```json
 {
+  "schema_version": 1,
   "type": "bdd",
   "variables": ["x1", "x2", "x3"],
   "order": ["x1", "x2", "x3"],
+  "complement_edges": true,
   "nodes": [
     { "id": 0, "type": "terminal", "value": 0 },
     { "id": 1, "type": "terminal", "value": 1 },
@@ -379,26 +382,45 @@ BDD structure exchanged between Typst lib and MCP:
 }
 ```
 
+**Complement edge encoding (CUDD convention):** When `complement_edges` is `true`, negative node references indicate complemented edges. For example, `"high": -2` means "follow edge to node 2, but invert the result." This matches CUDD's pointer-based complement encoding. The renderer draws a bubble marker (○) on complemented edges.
+
 ### 6.1 ADD Extension Format
 
-For ADD variants, the format extends naturally:
+For ADD (Algebraic Decision Diagrams), terminals hold real values:
 
 ```json
 {
+  "schema_version": 1,
   "type": "add",
   "nodes": [
     { "id": 0, "type": "terminal", "value": 3.14 },
     { "id": 1, "type": "terminal", "value": 0.0 },
-    { "id": 2, "type": "variable", "var": "x1", "low": 1, "high": 0,
-      "edge_weights": { "low": 1.0, "high": 2.5 } }
+    { "id": 2, "type": "variable", "var": "x1", "low": 1, "high": 0 }
   ]
 }
 ```
 
-- BDD: terminal `value` is `0 | 1`
-- ADD: terminal `value` is `number` (any real)
-- EVBDD: variable nodes include `edge_weights`
-- ZDD: same format, different `type` field + reduction semantics
+### 6.2 EVBDD Extension Format
+
+For EVBDD (Edge-Valued BDDs), edges carry weights:
+
+```json
+{
+  "schema_version": 1,
+  "type": "evbdd",
+  "nodes": [
+    { "id": 0, "type": "terminal", "value": 0.0 },
+    { "id": 1, "type": "variable", "var": "x1",
+      "low": { "to": 0, "weight": 1.0 },
+      "high": { "to": 0, "weight": 2.5 } }
+  ]
+}
+```
+
+- BDD: terminal `value` is `0 | 1`; edges may be complemented (negative node refs)
+- ADD: terminal `value` is `number` (any real); no complement edges
+- EVBDD: edges are objects `{ to, weight }` instead of plain node IDs
+- ZDD: same format as BDD, different `type` field + reduction semantics
 - MDD: variable nodes include `children: number[]` instead of `low/high`
 
 ## 7. Future Extensions (ADD Variants)
