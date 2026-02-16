@@ -4,6 +4,16 @@ A [Typst](https://typst.app) package for visualizing Binary Decision Diagrams (B
 
 **Requires Typst >= 0.12 and [fletcher](https://typst.app/universe/package/fletcher) >= 0.5.8**
 
+## Claude Code Skill
+
+This project is a Claude Code plugin. Install it to get `/typdd` and `/typdd-dev` skills:
+
+```
+/plugin marketplace add https://github.com/hmyuuu/typdd
+/plugin install typdd
+/plugin install typdd-dev
+```
+
 ## Usage
 
 ```typ
@@ -70,14 +80,6 @@ bdd("(x1 & x2) | (x3 & x4)", compact: true, style: "curved", height: 2cm)
 ### `bdd-from-json(data, ..options)`
 
 Import a BDD from JSON interchange format. Same rendering options as `bdd()`.
-
-## Claude Code Skill
-
-This project is a Claude Code plugin. Install it to get `/typdd` and `/typdd-dev` skills:
-
-```
-/plugin install typdd@typdd-marketplace
-```
 
 ## Development
 
