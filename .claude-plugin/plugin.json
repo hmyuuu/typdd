@@ -1,0 +1,8 @@
+{
+  "name": "typdd",
+  "version": "0.1.0",
+  "description": "BDD (Binary Decision Diagram) visualization skill for Typst — draw, customize, and develop decision diagrams",
+  "author": {
+    "name": "hmyuuu"
+  }
+}
