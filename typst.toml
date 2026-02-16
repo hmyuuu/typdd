@@ -1,0 +1,16 @@
+[package]
+name = "typdd"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Huai-Ming Yu"]
+license = "MIT"
+description = "Decision Diagram Visualization for Typst — BDD, ADD, and more"
+repository = "https://github.com/hmyuuu/typdd"
+keywords = ["bdd", "decision-diagram", "visualization", "boolean"]
+compiler = "0.12.0"
+
+[dependencies]
+fletcher = "0.5.8"
+
+[tool.tytanic]
+tests = "tests"
