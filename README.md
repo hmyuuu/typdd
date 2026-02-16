@@ -4,14 +4,13 @@ A [Typst](https://typst.app) package for visualizing Binary Decision Diagrams (B
 
 **Requires Typst >= 0.12 and [fletcher](https://typst.app/universe/package/fletcher) >= 0.5.8**
 
-## Claude Code Skill
+## Skills
 
-This project is a Claude Code plugin. Install it to get `/typdd` and `/typdd-dev` skills:
+This project is also available as a [Claude Code](https://claude.com/code) plugin. Install to get your ai agents equipped with `/typdd` skill:
 
 ```
 /plugin marketplace add https://github.com/hmyuuu/typdd
 /plugin install typdd
-/plugin install typdd-dev
 ```
 
 ## Usage
