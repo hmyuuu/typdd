@@ -57,10 +57,12 @@ src/
   order.typ          # Variable ordering heuristics
   abstract.typ       # Subtree collapsing, stats
   import.typ         # JSON interchange import
+  symbols.typ        # Symbolic analysis (is-sat, is-tautology, support, sat-count)
 tests/
   parse/test.typ     # Parser unit tests
   bdd/test.typ       # BDD construction + truth-table oracle
   render/test.typ    # Visual rendering (compile-only, incl. 20-var stress test)
+  symbols/test.typ   # Symbol engine unit tests
   integration/test.typ  # Full pipeline + JSON import + ordering
 typdd-mcp/           # MCP server (TypeScript mirror)
 ```

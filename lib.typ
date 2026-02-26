@@ -10,6 +10,7 @@
 #import "src/styles.typ": get-style, merge-style
 #import "src/render.typ": render-bdd
 #import "src/import.typ": import-json
+#import "src/symbols.typ": is-sat, is-tautology, support, sat-count
 
 // Alias built-in scale before parameter shadowing
 #let _typst-scale = scale
