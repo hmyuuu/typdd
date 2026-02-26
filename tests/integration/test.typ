@@ -150,6 +150,25 @@
 }
 
 // ════════════════════════════════════════════════════════════════════════
+// JSON file import: json() + bdd-from-json()
+// ════════════════════════════════════════════════════════════════════════
+
+#{ // Load BDD from a .json file on disk
+  let data = json("fixtures/and.json")
+  let imported = import-json(data)
+
+  // Same truth-table verification as inline JSON test
+  assert.eq(eval-bdd(imported, (x1: false, x2: false)), false)
+  assert.eq(eval-bdd(imported, (x1: false, x2: true)),  false)
+  assert.eq(eval-bdd(imported, (x1: true,  x2: false)), false)
+  assert.eq(eval-bdd(imported, (x1: true,  x2: true)),  true)
+
+  // Renders without panic via the recommended pattern
+  bdd-from-json(data)
+  bdd-from-json(data, style: "paper", compact: true)
+}
+
+// ════════════════════════════════════════════════════════════════════════
 // Abstraction: bdd-stats
 // ════════════════════════════════════════════════════════════════════════
 

@@ -80,6 +80,34 @@ bdd("(x1 & x2) | (x3 & x4)", compact: true, style: "curved", height: 2cm)
 
 Import a BDD from JSON interchange format. Same rendering options as `bdd()`.
 
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `data` | `dictionary` | required | Parsed JSON object (see schema below) |
+
+**Loading from a file** — use Typst's built-in `json()`:
+
+```typ
+#bdd-from-json(json("my-bdd.json"))
+#bdd-from-json(json("my-bdd.json"), style: "paper", compact: true)
+```
+
+**JSON schema:**
+
+```json
+{
+  "schema_version": 1,
+  "type": "bdd",
+  "order": ["x1", "x2"],
+  "nodes": [
+    { "id": 0, "type": "terminal", "value": 0 },
+    { "id": 1, "type": "terminal", "value": 1 },
+    { "id": 2, "type": "variable", "var": "x2", "low": 0, "high": 1 },
+    { "id": 3, "type": "variable", "var": "x1", "low": 0, "high": 2 }
+  ],
+  "root": 3
+}
+```
+
 ## Development
 
 ```bash
