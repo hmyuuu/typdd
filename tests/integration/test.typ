@@ -100,6 +100,38 @@
 }
 
 // ════════════════════════════════════════════════════════════════════════
+// Center-root: root node pinned to x=0
+// ════════════════════════════════════════════════════════════════════════
+
+#{ // Asymmetric expression: root must end up at x=0 with center-root: true
+  let data = build-bdd("x1 & (x2 | !x3)")
+  let sty = get-style("classic")
+  let pos = assign-positions(data, sty, center-root: true)
+  let root-pos = pos.at(str(data.root))
+  assert.eq(root-pos.x, 0.0, message: "Root should be centered at x=0")
+}
+
+#{ // Symmetric expression
+  let data = build-bdd("(x1 & x2) | (x3 & x4)")
+  let sty = get-style("classic")
+  let pos = assign-positions(data, sty, center-root: true)
+  let root-pos = pos.at(str(data.root))
+  assert.eq(root-pos.x, 0.0, message: "Root should be centered at x=0 for symmetric expr")
+}
+
+#{ // center-root: false should NOT necessarily put root at x=0
+  let data = build-bdd("x1 & (x2 | !x3)")
+  let sty = get-style("classic")
+  let pos-centered = assign-positions(data, sty, center-root: true)
+  let pos-uncentered = assign-positions(data, sty, center-root: false)
+  // Both should produce valid positions for all nodes
+  for n in data.nodes {
+    assert(str(n.id) in pos-centered, message: "Missing position (centered)")
+    assert(str(n.id) in pos-uncentered, message: "Missing position (uncentered)")
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
 // Ordering: FORCE ≤ DFS for (x1&x2)|(x3&x4)  (classic adversarial case)
 // ════════════════════════════════════════════════════════════════════════
 
