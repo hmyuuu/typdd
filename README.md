@@ -80,6 +80,28 @@ bdd("(x1 & x2) | (x3 & x4)", compact: true, style: "curved", height: 2cm)
 
 Import a BDD from JSON interchange format. Same rendering options as `bdd()`.
 
+### Symbol Engine
+
+Symbolic analysis functions operate on BDD data structures returned by `build-bdd()`.
+
+```typ
+#import "@preview/typdd:0.1.0": *
+#import "@preview/typdd:0.1.0" as typdd
+
+#let b = typdd.build-bdd("x1 & x2")
+#typdd.is-sat(b)       // true
+#typdd.is-tautology(b)  // false
+#typdd.support(b)       // ("x1", "x2")
+#typdd.sat-count(b)     // 1
+```
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `is-sat(bdd)` | `bool` | `true` if the function has at least one satisfying assignment |
+| `is-tautology(bdd)` | `bool` | `true` if all assignments satisfy the function |
+| `support(bdd)` | `array` | Variables that actually influence the output (in ordering sequence) |
+| `sat-count(bdd)` | `int` | Number of satisfying assignments |
+
 ## Development
 
 ```bash
