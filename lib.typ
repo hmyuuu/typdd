@@ -190,6 +190,11 @@
 
 /// Import a BDD from a JSON structure and render it.
 ///
+/// Use with Typst's `json()` to load from a file:
+///   ```typ
+///   #bdd-from-json(json("my-bdd.json"))
+///   ```
+///
 /// - data (dictionary): Parsed JSON object conforming to typdd interchange format
 /// - style (str): Style preset name
 /// - scale (float): Uniform scale factor for the diagram (default: 1.0)

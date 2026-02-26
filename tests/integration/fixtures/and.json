@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "type": "bdd",
+  "order": ["x1", "x2"],
+  "nodes": [
+    { "id": 0, "type": "terminal", "value": 0 },
+    { "id": 1, "type": "terminal", "value": 1 },
+    { "id": 2, "type": "variable", "var": "x2", "low": 0, "high": 1 },
+    { "id": 3, "type": "variable", "var": "x1", "low": 0, "high": 2 }
+  ],
+  "root": 3
+}
